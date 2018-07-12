@@ -7,6 +7,12 @@ const shell = require("shelljs");
 const AWS = require("aws-sdk");
 
 
+const initProfile = (profile) =>{
+	const creds = new AWS.SharedIniFileCredentials({profile: profile});
+	AWS.config.update({credentials:creds,region:'us-east-1'}) 
+	const ecs = new AWS.ECS()
+	return ecs;
+}
 
 
 const getClusters = (ecs) => {
@@ -22,11 +28,8 @@ const getClusters = (ecs) => {
 
 
 
-const getEcsHosts = async (profile) => {
-	const creds = new AWS.SharedIniFileCredentials({profile: profile});
-	AWS.config.update({credentials:creds,region:'us-east-1'}) 
-	//TODO prompt region 
-	const ecs = new AWS.ECS()
+const getEcsClusters = async (profile) => {
+	const ecs = initProfile(profile);
 	try {
 		const clusters = await getClusters(ecs);
 		return clusters;
@@ -56,7 +59,6 @@ const askQuestions = () => {
 };
 
 const selectCluster = (data) => {
-	console.log(typeof data)
 	const questions = [
     {
       type: "list",
@@ -67,6 +69,22 @@ const selectCluster = (data) => {
   ];
   return inquirer.prompt(questions);
 }
+
+const listContainerInstances = (selectedCluster,profile) =>{
+	const  params = {
+		cluster: selectedCluster.toString().split('/')[1]
+	}
+
+	const ecsListContainerInstances = initProfile(profile).listContainerInstances(params).promise();
+	ecsListContainerInstances
+	.then((data)=>{
+		console.log(data);
+	})
+	.catch((err)=>{
+		console.log(err);
+	})
+}
+
 
 
 const init = () => {
@@ -84,9 +102,9 @@ const init = () => {
 const run = async () => {
 	init()
 	const {AWS_PROFILE_NAME, BASTION_HOST_NAME} = await askQuestions();
-	const clusters = await getEcsHosts(AWS_PROFILE_NAME);
+	const clusters = await getEcsClusters(AWS_PROFILE_NAME);
 	const selectedCluster = await selectCluster(clusters.clusterArns);
-
+	const containerInstances = await listContainerInstances(selectedCluster,AWS_PROFILE_NAME);
 }
 
 run();
