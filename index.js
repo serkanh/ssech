@@ -169,6 +169,7 @@ const run = async () => {
 	console.log(containerIps)
 	const createconfig = await createConfig(selectedCluster,containerIps,BASTION_HOST_NAME);
 	console.log(createconfig)
+	console.log(selectedCluster.CLUSTER_NAME.toString().split('/'))
 }
 
 run();
