@@ -6,6 +6,7 @@ const figlet = require("figlet");
 const shell = require("shelljs");
 const AWS = require("aws-sdk");
 const _ = require("lodash");
+const makeconfig = require("./makeconfig")
 
 const initProfile = (profile) => {
 	const creds = new AWS.SharedIniFileCredentials({
@@ -135,6 +136,12 @@ const getContainerInstanceIps = (instancesIds, profile) => {
 }
 
 
+const createConfig = (selectedCluster,containerIps,bastionHost) => {
+	const config =new makeconfig(selectedCluster,containerIps,bastionHost)
+	return config.createConfig();
+}
+
+
 
 const init = () => {
 	console.log(
@@ -160,6 +167,8 @@ const run = async () => {
 	const containerIds = await getContainerInstanceIds(selectedCluster, containerInstances, AWS_PROFILE_NAME);
 	const containerIps = await getContainerInstanceIps(containerIds, AWS_PROFILE_NAME);
 	console.log(containerIps)
+	const createconfig = await createConfig(selectedCluster,containerIps,BASTION_HOST_NAME);
+	console.log(createconfig)
 }
 
 run();

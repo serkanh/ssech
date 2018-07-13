@@ -8,8 +8,19 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Launch Program",
+			"name": "Launch index.js",
 			"program": "${workspaceFolder}/index.js",
+			"console": "integratedTerminal",
+			"skipFiles": [
+        "${workspaceRoot}/node_modules/**/*.js",
+        "<node_internals>/**/*.js"
+      ],
+		}
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Launch file.js",
+			"program": "${workspaceFolder}/file.js",
 			"console": "integratedTerminal",
 			"skipFiles": [
         "${workspaceRoot}/node_modules/**/*.js",
