@@ -12,9 +12,9 @@
 			"program": "${workspaceFolder}/index.js",
 			"console": "integratedTerminal",
 			"skipFiles": [
-				"node_modules/**/*.js",
-				"lib/**/*.js"
-			]
+        "${workspaceRoot}/node_modules/**/*.js",
+        "<node_internals>/**/*.js"
+      ],
 		}
 	]
 }

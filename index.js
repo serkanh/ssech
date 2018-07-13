@@ -96,22 +96,45 @@ const getContainerInstanceIds = (selectedCluster,listofcontainerhosts,profile) =
 	listofcontainerhosts.containerInstanceArns.forEach((val)=>{
 		containerIds.push(val.split('/')[1])
 	})
-	console.log('CLUSTERNAME=>',selectedCluster)
 	let params = {
 		cluster: selectedCluster.CLUSTER_NAME.toString().split('/')[1],
 		containerInstances: containerIds
 	}
 	const describeContainerInstances = ecs.describeContainerInstances(params).promise()
-	describeContainerInstances
+	return describeContainerInstances
 	.then((data)=>{
 		let ec2instanceIds = _.map(data.containerInstances,'ec2InstanceId')
-		console.log(ec2instanceIds)
+		// return new Promise((resolve,reject)=>{
+		// 	resolve(ec2instanceIds)
+		// })
 		return ec2instanceIds
 	})
 	.catch((err)=>{
 		console.log(err)
 	})
 
+}
+ 
+
+const getContainerInstanceIps = (instancesIds,profile) => {
+	const AWS =  initProfile(profile);
+	const ec2 = new AWS.EC2();
+	let params = {
+		InstanceIds:instancesIds
+	}
+	return ec2.describeInstances(params).promise()
+	.then((data)=>{
+		//console.log(data.Reservations)
+		let privateIps = [];
+		data.Reservations.forEach((reservation)=>{
+			console.log(reservation.Instances[0].NetworkInterfaces[0].PrivateIpAddress)
+			privateIps.push(reservation.Instances[0].NetworkInterfaces[0].PrivateIpAddress)
+		})
+		return privateIps;
+	})
+	.catch((err)=>{
+		console.log(err)
+	})
 }
 
 
@@ -135,8 +158,8 @@ const run = async () => {
 	const selectedCluster = await selectCluster(cluster.clusterArns);
 	const containerInstances = await listContainerInstances(selectedCluster,AWS_PROFILE_NAME);
 	const containerIds = await getContainerInstanceIds(selectedCluster,containerInstances,AWS_PROFILE_NAME);
-
-
+	const containerIps = await getContainerInstanceIps(containerIds,AWS_PROFILE_NAME);
+	console.log(containerIps)
 }
 
 run();
