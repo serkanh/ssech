@@ -7,18 +7,23 @@ const shell = require("shelljs");
 const AWS = require("aws-sdk");
 const _ = require("lodash");
 
-const initProfile = (profile) =>{
-	const creds = new AWS.SharedIniFileCredentials({profile: profile});
-	AWS.config.update({credentials:creds,region:'us-east-1'}) 
+const initProfile = (profile) => {
+	const creds = new AWS.SharedIniFileCredentials({
+		profile: profile
+	});
+	AWS.config.update({
+		credentials: creds,
+		region: 'us-east-1'
+	})
 	return AWS;
 }
 
 
 const getClusters = (ecs) => {
-	return new Promise((resolve,reject)=>{
-		let params  = {};
-		ecs.listClusters(params,(err,data)=>{
-			if(err) reject(err)
+	return new Promise((resolve, reject) => {
+		let params = {};
+		ecs.listClusters(params, (err, data) => {
+			if (err) reject(err)
 			else resolve(data)
 		})
 	})
@@ -28,12 +33,12 @@ const getClusters = (ecs) => {
 
 
 const getEcsClusters = async (profile) => {
-	const AWS =  initProfile(profile);
+	const AWS = initProfile(profile);
 	const ecs = new AWS.ECS();
 	try {
 		const clusters = await getClusters(ecs);
 		return clusters;
-	} catch(e){
+	} catch (e) {
 		console.log(e)
 	}
 
@@ -41,59 +46,56 @@ const getEcsClusters = async (profile) => {
 
 
 const askQuestions = () => {
-  const questions = [
-    {
-      type: "list",
-      name: "AWS_PROFILE_NAME",
-      message: "Which aws profile do you want to use?",
-      choices: ["HA", "jumpstart", "default"]
-    },
-    {
-      type: "list",
-      name: "BASTION_HOST_NAME",
-      message: "Which bastion host do you want to use?",
-      choices: ["ha-bastion", "ha-bastion-dev", "contentpublishing-nat"]
+	const questions = [{
+			type: "list",
+			name: "AWS_PROFILE_NAME",
+			message: "Which aws profile do you want to use?",
+			choices: ["HA", "jumpstart", "default"]
 		},
-  ];
-  return inquirer.prompt(questions);
+		{
+			type: "list",
+			name: "BASTION_HOST_NAME",
+			message: "Which bastion host do you want to use?",
+			choices: ["ha-bastion", "ha-bastion-dev", "contentpublishing-nat"]
+		},
+	];
+	return inquirer.prompt(questions);
 };
 
 const selectCluster = (data) => {
-	const questions = [
-    {
-      type: "list",
-      name: "CLUSTER_NAME",
-      message: "Which cluster you want access to?",
-      choices: data
-    }
-  ];
-  return inquirer.prompt(questions);
+	const questions = [{
+		type: "list",
+		name: "CLUSTER_NAME",
+		message: "Which cluster you want access to?",
+		choices: data
+	}];
+	return inquirer.prompt(questions);
 }
 
-const listContainerInstances = (selectedCluster,profile) =>{
-	console.log('SELECTEDCLUSTER',selectedCluster.CLUSTER_NAME.toString().split('/')[1])
-	const  params = {
+const listContainerInstances = (selectedCluster, profile) => {
+
+	const params = {
 		cluster: selectedCluster.CLUSTER_NAME.toString().split('/')[1]
-	//	cluster: 'preparation-h-preprod'
+
 	}
 	const ecs = new AWS.ECS();
 
 	const ecsListContainerInstances = ecs.listContainerInstances(params).promise();
 	return ecsListContainerInstances
-	.then((data)=>{
-		return data;
-	})
-	.catch((err)=>{
-		console.log(err);
-	})
+		.then((data) => {
+			return data;
+		})
+		.catch((err) => {
+			console.log(err);
+		})
 }
 
 
-const getContainerInstanceIds = (selectedCluster,listofcontainerhosts,profile) => {
-	const AWS =  initProfile(profile);
+const getContainerInstanceIds = (selectedCluster, listofcontainerhosts, profile) => {
+	const AWS = initProfile(profile);
 	const ecs = new AWS.ECS();
-  let containerIds = [];
-	listofcontainerhosts.containerInstanceArns.forEach((val)=>{
+	let containerIds = [];
+	listofcontainerhosts.containerInstanceArns.forEach((val) => {
 		containerIds.push(val.split('/')[1])
 	})
 	let params = {
@@ -102,39 +104,34 @@ const getContainerInstanceIds = (selectedCluster,listofcontainerhosts,profile) =
 	}
 	const describeContainerInstances = ecs.describeContainerInstances(params).promise()
 	return describeContainerInstances
-	.then((data)=>{
-		let ec2instanceIds = _.map(data.containerInstances,'ec2InstanceId')
-		// return new Promise((resolve,reject)=>{
-		// 	resolve(ec2instanceIds)
-		// })
-		return ec2instanceIds
-	})
-	.catch((err)=>{
-		console.log(err)
-	})
+		.then((data) => {
+			let ec2instanceIds = _.map(data.containerInstances, 'ec2InstanceId')
+			return ec2instanceIds
+		})
+		.catch((err) => {
+			console.log(err)
+		})
 
 }
- 
 
-const getContainerInstanceIps = (instancesIds,profile) => {
-	const AWS =  initProfile(profile);
+
+const getContainerInstanceIps = (instancesIds, profile) => {
+	const AWS = initProfile(profile);
 	const ec2 = new AWS.EC2();
 	let params = {
-		InstanceIds:instancesIds
+		InstanceIds: instancesIds
 	}
 	return ec2.describeInstances(params).promise()
-	.then((data)=>{
-		//console.log(data.Reservations)
-		let privateIps = [];
-		data.Reservations.forEach((reservation)=>{
-			console.log(reservation.Instances[0].NetworkInterfaces[0].PrivateIpAddress)
-			privateIps.push(reservation.Instances[0].NetworkInterfaces[0].PrivateIpAddress)
+		.then((data) => {
+			let privateIps = [];
+			data.Reservations.forEach((reservation) => {
+				privateIps.push(reservation.Instances[0].NetworkInterfaces[0].PrivateIpAddress)
+			})
+			return privateIps;
 		})
-		return privateIps;
-	})
-	.catch((err)=>{
-		console.log(err)
-	})
+		.catch((err) => {
+			console.log(err)
+		})
 }
 
 
@@ -142,7 +139,7 @@ const getContainerInstanceIps = (instancesIds,profile) => {
 const init = () => {
 	console.log(
 		chalk.green(
-			figlet.textSync("welcome to ssech",{
+			figlet.textSync("welcome to ssech", {
 				font: "doom",
 				horizantalLayout: "default",
 				verticalLayout: "default"
@@ -153,12 +150,15 @@ const init = () => {
 
 const run = async () => {
 	init()
-	const {AWS_PROFILE_NAME, BASTION_HOST_NAME} = await askQuestions();
+	const {
+		AWS_PROFILE_NAME,
+		BASTION_HOST_NAME
+	} = await askQuestions();
 	const cluster = await getEcsClusters(AWS_PROFILE_NAME);
 	const selectedCluster = await selectCluster(cluster.clusterArns);
-	const containerInstances = await listContainerInstances(selectedCluster,AWS_PROFILE_NAME);
-	const containerIds = await getContainerInstanceIds(selectedCluster,containerInstances,AWS_PROFILE_NAME);
-	const containerIps = await getContainerInstanceIps(containerIds,AWS_PROFILE_NAME);
+	const containerInstances = await listContainerInstances(selectedCluster, AWS_PROFILE_NAME);
+	const containerIds = await getContainerInstanceIds(selectedCluster, containerInstances, AWS_PROFILE_NAME);
+	const containerIps = await getContainerInstanceIps(containerIds, AWS_PROFILE_NAME);
 	console.log(containerIps)
 }
 
