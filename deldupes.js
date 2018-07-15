@@ -1,30 +1,37 @@
-'use strict'
+
 
 const fs = require('fs');
 const util = require('util');
 
 const readfile = util.promisify(fs.readFile);
-//const writef = util.promisify(fs.writedir);
+// const writef = util.promisify(fs.writedir);
 
-
-
-async function rmdupes() {
-	try {
-		let content = await readfile('./config', 'utf8');
-		console.log(content)
-		var re = RegExp('preparation-h-prod*','g'); 
-		let recordIndexes = [];
-		while(re.exec(content.toString())){
-			recordIndexes.push(re.lastIndex);
-		}
-		console.log(recordIndexes)
-	} catch(e) {
-		console.log('cant read the file',e)
-	}
-
-	
-
-
+function makeMultiLineString(arr) {
+  let str = '';
+  arr.forEach((el, index) => {
+    el.forEach((e) => {
+      str += `${e}\n`;
+    });
+  });
+  return str;
 }
 
-rmdupes()
+// removes any existing host records for given cluster
+async function rmdupes(clustername) {
+  try {
+    const content = await readfile('./config', 'utf8');
+    const lines = content.split(/\r?\n/);
+    const modified = [];
+    lines.forEach((line, index) => {
+      if (!(line.includes(clustername)) && line.includes('Host ')) {
+        modified.push(lines.slice(index, index + 5));
+      }
+    });
+
+    return makeMultiLineString(modified);
+  } catch (e) {
+    console.log('cant read the file', e);
+  }
+}
+
+rmdupes('preparation-h-prod').then(console.log);

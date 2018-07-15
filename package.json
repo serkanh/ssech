@@ -15,5 +15,10 @@
     "inquirer": "^6.0.0",
     "lodash": "^4.17.10",
     "shelljs": "^0.8.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0"
   }
 }

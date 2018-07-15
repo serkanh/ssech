@@ -8,8 +8,19 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Launch index.js",
+			"name": "index.js",
 			"program": "${workspaceFolder}/index.js",
+			"console": "integratedTerminal",
+			"skipFiles": [
+        "${workspaceRoot}/node_modules/**/*.js",
+        "<node_internals>/**/*.js"
+      ],
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "file.js",
+			"program": "${workspaceFolder}/file.js",
 			"console": "integratedTerminal",
 			"skipFiles": [
         "${workspaceRoot}/node_modules/**/*.js",
@@ -19,8 +30,8 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Launch file.js",
-			"program": "${workspaceFolder}/file.js",
+			"name": "deldupes.js",
+			"program": "${workspaceFolder}/deldupes.js",
 			"console": "integratedTerminal",
 			"skipFiles": [
         "${workspaceRoot}/node_modules/**/*.js",
