@@ -8,7 +8,7 @@ const readfile = util.promisify(fs.readFile);
 
 function makeMultiLineString(arr) {
   let str = '';
-  arr.forEach((el, index) => {
+  arr.forEach((el) => {
     el.forEach((e) => {
       str += `${e}\n`;
     });

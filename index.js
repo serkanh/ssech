@@ -3,10 +3,9 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const figlet = require('figlet');
-const shell = require('shelljs');
 const AWS = require('aws-sdk');
 const _ = require('lodash');
-const makeconfig = require('./makeconfig');
+const MakeConfig = require('./makeconfig');
 
 const initProfile = (profile) => {
   const creds = new AWS.SharedIniFileCredentials({
@@ -128,7 +127,7 @@ const getContainerInstanceIps = (instancesIds, profile) => {
 
 
 const createConfig = (selectedCluster, containerIps, bastionHost) => {
-  const config = new makeconfig(selectedCluster, containerIps, bastionHost);
+  const config = new MakeConfig(selectedCluster, containerIps, bastionHost);
   return config.createConfig();
 };
 
