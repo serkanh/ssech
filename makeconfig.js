@@ -16,7 +16,9 @@ Host ${this.selectedCluster}-${index}
 \tUser ec2-user
 \tProxyCommand ssh ${this.bastion} -W %h:%p`;
     });
-    return record;
+    return new Promise((resolve) => {
+      resolve(record);
+    });
   }
 }
 

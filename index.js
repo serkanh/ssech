@@ -5,7 +5,9 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 const AWS = require('aws-sdk');
 const _ = require('lodash');
+const deldupes = require('./deldupes');
 const MakeConfig = require('./makeconfig');
+const BackupAndUpdate = require('./backupUpdate');
 
 const initProfile = (profile) => {
   const creds = new AWS.SharedIniFileCredentials({
@@ -155,10 +157,10 @@ const run = async () => {
   const containerInstances = await listContainerInstances(selectedCluster, AWS_PROFILE_NAME);
   const containerIds = await getContainerInstanceIds(selectedCluster, containerInstances, AWS_PROFILE_NAME);
   const containerIps = await getContainerInstanceIps(containerIds, AWS_PROFILE_NAME);
-  console.log(containerIps);
-  const createconfig = await createConfig(selectedCluster, containerIps, BASTION_HOST_NAME);
-  console.log(createconfig);
-  console.log(selectedCluster.CLUSTER_NAME.toString().split('/'));
+  const configRecord = await createConfig(selectedCluster, containerIps, BASTION_HOST_NAME);
+  await deldupes(selectedCluster);
+  const backupAndUpdate = new BackupAndUpdate('config', './');
+  backupAndUpdate.backupUpdate(configRecord);
 };
 
 run();
