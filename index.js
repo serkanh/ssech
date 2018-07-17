@@ -159,7 +159,7 @@ const run = async () => {
   const containerIps = await getContainerInstanceIps(containerIds, AWS_PROFILE_NAME);
   const configRecord = await createConfig(selectedCluster, containerIps, BASTION_HOST_NAME);
   await deldupes(selectedCluster);
-  const backupAndUpdate = new BackupAndUpdate('config', './');
+  const backupAndUpdate = new BackupAndUpdate();
   backupAndUpdate.backupUpdate(configRecord);
 };
 

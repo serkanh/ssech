@@ -8,7 +8,7 @@ const copyFileSync = util.promisify(fs.copyFileSync);
 
 class BackupAndUpdate {
   constructor(file, path) {
-    this.file = file;
+    this.file = file || 'config';
     this.path = path || `${process.env.HOME}/.ssh/`;
   }
 
