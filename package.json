@@ -1,24 +1,27 @@
 {
-  "name": "ssech",
-  "version": "1.0.0",
-  "description": "A simple utility to update ssh config file with ecs host config by providing ecs clustername",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "aws-sdk": "^2.273.1",
-    "chalk": "^2.4.1",
-    "figlet": "^1.2.0",
-    "inquirer": "^6.0.0",
-    "lodash": "^4.17.10",
-    "shelljs": "^0.8.2"
-  },
-  "devDependencies": {
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb-base": "^13.0.0",
-    "eslint-plugin-import": "^2.13.0"
-  }
+	"name": "ssech",
+	"version": "1.0.0",
+	"description": "A simple utility to update ssh config file with ecs host config by providing ecs clustername",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"bin": {
+		"ssech": "./index.js"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"aws-sdk": "^2.273.1",
+		"chalk": "^2.4.1",
+		"figlet": "^1.2.0",
+		"inquirer": "^6.0.0",
+		"lodash": "^4.17.10",
+		"shelljs": "^0.8.2"
+	},
+	"devDependencies": {
+		"eslint": "^4.19.1",
+		"eslint-config-airbnb-base": "^13.0.0",
+		"eslint-plugin-import": "^2.13.0"
+	}
 }
